@@ -10,13 +10,23 @@ import java.net.http.HttpResponse;
 
 public class GeminiService {
 
-    private static final String GEMINI_API_KEY = "AIzaSyBfpeZ58EuCBjYAemxNz1_El26oVACulzA"; 
-    
-    private static final String URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" + GEMINI_API_KEY;
+    // 1. Método seguro para pegar a chave
+    private static String getApiKey() {
+        // Tenta pegar da variável de ambiente (Nuvem)
+        String key = System.getenv("GEMINI_API_KEY");
+        
+        if (key == null || key.isEmpty()) {
+            // Se não achar (rodando local), retorna aviso ou uma chave de teste
+            return "CHAVE_NAO_CONFIGURADA"; 
+        }
+        return key;
+    }
+
+    // 2. Definimos apenas a BASE da URL (sem a chave aqui)
+    private static final String URL_BASE = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=";
 
     private final Gson gson = new Gson();
     private final HttpClient client = HttpClient.newHttpClient();
-
 
     public String corrigirQuestao(String textoAluno, String enunciadoOriginal) {
         String prompt = "Atue como um professor de matemática. \n" +
@@ -26,7 +36,7 @@ public class GeminiService {
                         "2) Se estiver errada, explique o erro. " +
                         "3) Seja breve e didático.";
 
-        return construirEEnviarJson(prompt);
+        return enviarParaGemini(prompt);
     }
 
     public String explicarErro(String enunciado, String respostaAluno, String respostaCorreta) {
@@ -34,14 +44,14 @@ public class GeminiService {
                         "Questão: " + enunciado + "\n" +
                         "O aluno marcou a alternativa: " + respostaAluno + "\n" +
                         "A alternativa correta é: " + respostaCorreta + "\n" +
-                        "Tarefa: Explique brevemente (máximo 2 frases) por que a alternativa do aluno está certa ou errada em relação à correta.";
+                        "Tarefa: Explique brevemente (máximo 2 frases) por que a alternativa do aluno está certa ou errada.";
 
-        return construirEEnviarJson(prompt);
+        return enviarParaGemini(prompt);
     }
 
-
-    private String construirEEnviarJson(String prompt) {
+    private String enviarParaGemini(String prompt) {
         try {
+            // Montagem do JSON
             JsonObject textPart = new JsonObject();
             textPart.addProperty("text", prompt);
 
@@ -59,8 +69,12 @@ public class GeminiService {
 
             String jsonBody = gson.toJson(body);
 
+            // 3. AQUI NÓS JUNTAMOS A URL COM A CHAVE SEGURA
+            String urlCompleta = URL_BASE + getApiKey();
+
+            // Envio da Requisição
             HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(URL))
+                .uri(URI.create(urlCompleta))
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
                 .build();
