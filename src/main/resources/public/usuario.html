@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Página do Usuário - SaberUp</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  <style>
+    main { padding: 2rem; }
+    .perfil { display: flex; align-items: center; gap: 2rem; flex-wrap: wrap; }
+    .foto-perfil { width: 120px; border-radius: 50%; border: 3px solid var(--primary-color); }
+    .dados-perfil h2 { color: var(--primary-color); margin-bottom: 0.5rem; }
+    .dados-perfil button {
+      padding: 0.5rem 1rem; border-radius: 30px; border: none;
+      background: var(--primary-color); color: white; cursor: pointer; transition: 0.2s;
+    }
+    .dados-perfil button:hover { background: var(--primary-dark); }
+    section h3 { color: var(--primary-color); margin-bottom: 1rem; }
+    #lista-jogos { list-style: none; padding: 0; }
+    #lista-jogos li {
+      background: var(--bg-color); padding: 0.8rem 1rem; margin-bottom: 0.5rem;
+      border-radius: 10px; display: flex; justify-content: space-between; align-items: center;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    #lista-jogos li:hover { transform: translateX(5px); box-shadow: 0 4px 10px rgba(0,0,0,0.15); }
+    .conquistas { display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1rem; }
+    .conquista {
+      background: var(--primary-light); color: white; padding: 0.8rem 1rem;
+      border-radius: 10px; font-weight: bold; flex: 1 1 150px; text-align: center;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .conquista:hover { transform: translateY(-5px); box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+    footer { background: var(--primary-color); color: white; text-align: center; padding: 1rem; margin-top: 2rem; }
+    .btn-logout {
+      background: #e74c3c; color: white; border-radius: 30px; padding: 0.5rem 1rem; border: none;
+      cursor: pointer; transition: 0.2s;
+    }
+    .btn-logout:hover { background: #c0392b; }
+    @media (max-width: 576px) { .perfil { flex-direction: column; text-align: center; } .dados-perfil button { margin-top: 1rem; } }
+  </style>
+</head>
+<body>
+  <!-- NAVBAR -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow">
+    <div class="container-fluid">
+      <a class="navbar-brand d-flex align-items-center fw-bold" href="index.html">
+        <img src="logo.png" alt="Logo SaberUp" width="40" height="40" class="me-2">
+        SaberUp
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menuNavbar">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="menuNavbar">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link" href="index.html"><i class="bi bi-house-door-fill"></i> Início</a></li>
+          <li class="nav-item"><a class="nav-link" href="materias.html"><i class="bi bi-journal-bookmark-fill"></i> Matérias</a></li>
+          <li class="nav-item"><a class="nav-link active" href="usuario.html"><i class="bi bi-person-circle"></i> Usuário</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- MAIN -->
+  <main>
+    <section class="perfil">
+      <img src="profile-picture-example.png" alt="Foto do usuário" class="foto-perfil">
+      <div class="dados-perfil">
+        <h2 id="nome-usuario">Usuário</h2>
+        <div class="d-flex gap-2">
+          <button id="btn-editar">Editar Perfil</button>
+          <button class="btn-logout" id="btn-logout">Sair</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="ultimos-jogos mt-4">
+      <h3>Últimos Jogos</h3>
+      <ul id="lista-jogos">
+        <li class="text-muted">Carregando...</li>
+      </ul>
+    </section>
+
+    <section class="extras mt-4">
+      <h3>Conquistas</h3>
+      <div class="conquistas" id="lista-conquistas">
+        <div class="conquista">🏅 Primeiro Quiz Feito!</div>
+      </div>
+    </section>
+  </main>
+
+  <footer>© 2025 SaberUp — Aprenda se divertindo!</footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+const usuario = JSON.parse(localStorage.getItem("usuario"));
+
+// Verifica se o usuário está logado
+if (!usuario || !usuario.idUsuario) {
+  alert("Usuário não logado. Faça login.");
+  window.location.href = "login.html";
+} else {
+  document.getElementById("nome-usuario").textContent = usuario.nome || usuario.nickname || "Usuário";
+}
+
+async function carregarPartidas() {
+  const lista = document.getElementById("lista-jogos");
+  lista.innerHTML = "<li>Carregando...</li>";
+
+  try {
+    const idUsuario = usuario.idUsuario;
+
+    const response = await fetch(`/partida/usuario/${idUsuario}`);
+    if (!response.ok) throw new Error("Erro ao buscar partidas.");
+
+    const partidas = await response.json();
+    lista.innerHTML = "";
+
+    if (!partidas || partidas.length === 0) {
+      lista.innerHTML = "<li class='text-muted'>Nenhuma partida encontrada.</li>";
+      return;
+    }
+
+    partidas.forEach(p => {
+      const li = document.createElement("li");
+
+      li.innerHTML = `
+        <div>
+          <strong>${p.materia || "Sem matéria"} - ${p.topico || "Sem tópico"} (${p.serieJogo || "Sem série"})</strong><br>
+          <small>${p.titulo || "Sem título"} — Partida #${p.idPartida}</small>
+        </div>
+        <span>Pontuação: <strong>${p.pontuacao}%</strong></span>
+      `;
+      lista.appendChild(li);
+    });
+  } catch (err) {
+    console.error(err);
+    lista.innerHTML = "<li class='text-danger'>Erro ao carregar partidas.</li>";
+  }
+}
+
+
+document.getElementById("btn-logout").addEventListener("click", () => {
+  localStorage.removeItem("usuario");
+  window.location.href = "login.html";
+});
+
+
+const navUl = document.querySelector("#menuNavbar ul");
+if (usuario && usuario.nome) {
+  const liUsuario = document.createElement("li");
+  liUsuario.className = "nav-item";
+  liUsuario.innerHTML = `<a class="nav-link" href="usuario.html"><i class="bi bi-person-circle"></i> ${usuario.nome}</a>`;
+  navUl.appendChild(liUsuario);
+}
+
+carregarPartidas();
+</script>
+  
+</body>
+</html>

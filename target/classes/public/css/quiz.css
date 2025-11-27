@@ -1,0 +1,29 @@
+#quiz-container {
+  max-width: 600px;
+  margin: auto;
+  text-align: left;
+}
+
+.list-group-item {
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+/* Opção selecionada antes de confirmar */
+.list-group-item.selected {
+  background-color: #cce5ff; /* azul claro */
+  border-color: #80bdff;
+}
+
+/* Resposta correta (após confirmação) */
+.list-group-item.correct {
+  background-color: #28a745 !important; /* verde forte */
+  color: white !important;
+}
+
+/* Resposta incorreta (após confirmação) */
+.list-group-item.incorrect {
+  background-color: #dc3545 !important; /* vermelho forte */
+  color: white !important;
+}
+

@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Saber Up - Quiz</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  
+  <style>
+    :root {
+      --primary-color: #0d6efd;
+      --ai-bg: #f0f7ff;
+      --ai-border: #cce5ff;
+    }
+
+    body {
+      background-color: #f8f9fa;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    /* Navbar Customizada e Moderna */
+    .navbar {
+      background: linear-gradient(135deg, #0d6efd, #0043a8) !important;
+    }
+    .navbar-brand img {
+      transition: transform 0.3s;
+    }
+    .navbar-brand:hover img {
+      transform: rotate(15deg);
+    }
+    .nav-link {
+        font-weight: 500;
+        transition: color 0.2s;
+    }
+    .nav-link.active {
+        font-weight: 700;
+        border-bottom: 2px solid white;
+    }
+
+    /* Quiz Card */
+    .quiz-card {
+      border: none;
+      border-radius: 20px;
+      transition: transform 0.2s;
+    }
+
+    .option-btn {
+      border-radius: 12px;
+      margin-bottom: 10px;
+      border: 2px solid #e9ecef;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+
+    .option-btn:hover {
+      background-color: #f1f4f8;
+      transform: translateX(5px);
+    }
+
+    .option-btn.selected {
+      background-color: var(--primary-color);
+      color: white;
+      border-color: var(--primary-color);
+    }
+
+    /* Resultado & IA */
+    .result-card {
+      border-left: 5px solid transparent;
+    }
+    .result-card.correct { border-left-color: #198754; }
+    .result-card.wrong { border-left-color: #dc3545; }
+
+    .ai-box {
+      background-color: var(--ai-bg);
+      border: 1px solid var(--ai-border);
+      border-radius: 15px;
+      padding: 20px;
+      position: relative;
+    }
+
+    .ai-avatar {
+      width: 40px;
+      height: 40px;
+      background: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      margin-right: 15px;
+    }
+
+    /* Formatação do Texto da IA */
+    .ai-content strong {
+      color: #0043a8;
+      font-weight: 700;
+    }
+    .ai-content ul {
+      padding-left: 20px;
+      margin-bottom: 0;
+    }
+    .ai-content li {
+      margin-bottom: 5px;
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar navbar-expand-lg navbar-dark shadow mb-4">
+    <div class="container-fluid">
+      <a class="navbar-brand d-flex align-items-center fw-bold" href="index.html">
+        <img src="logo.png" alt="Logo" width="35" height="35" class="me-2 bg-white rounded-circle p-1">
+        SaberUp
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menuNavbar">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      
+      <div class="collapse navbar-collapse" id="menuNavbar">
+        <ul class="navbar-nav ms-auto align-items-center">
+          <li class="nav-item">
+            <a class="nav-link" href="index.html" id="link-inicio"><i class="bi bi-house-door-fill me-1"></i> Início</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="materias.html" id="link-materias"><i class="bi bi-journal-bookmark-fill me-1"></i> Matérias</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="usuario.html" id="link-usuario"><i class="bi bi-person-circle me-1"></i> Usuário</a>
+          </li>
+          <li class="nav-item ms-lg-3 mt-2 mt-lg-0">
+             <span class="badge bg-white text-primary rounded-pill px-3 py-2">
+                <i class="bi bi-person-check-fill me-1"></i> <span id="user-display">Aluno</span>
+             </span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container mb-5" style="max-width: 800px;">
+    
+    <div id="quiz-header" class="text-center mb-4">
+      <h2 id="quiz-title" class="fw-bold text-primary">Carregando...</h2>
+      <div class="progress mt-3 shadow-sm" style="height: 10px; border-radius: 10px;">
+        <div id="progress-bar" class="progress-bar bg-success" role="progressbar" style="width: 0%"></div>
+      </div>
+      <small class="text-muted mt-2 d-block">Questão <span id="q-current">1</span> de <span id="q-total">--</span></small>
+    </div>
+    
+    <div id="quiz-container" class="card quiz-card shadow-lg p-4 p-md-5">
+      <div id="question" class="h5 mb-4 fw-bold text-dark lh-base"></div>
+      
+      <div id="options" class="list-group mb-4"></div>
+
+      <div class="mb-4 p-3 bg-light rounded-4 border border-dashed">
+        <label class="form-label fw-bold text-secondary small"><i class="bi bi-camera-fill me-1"></i> Envie uma foto da resolução (Opcional)</label>
+        <input type="file" class="form-control" id="upload-input" accept="image/*">
+      </div>
+
+      <div class="d-flex justify-content-between mt-2">
+        <button id="confirm-btn" class="btn btn-success btn-lg px-4 rounded-pill shadow-sm" disabled>
+          Confirmar <i class="bi bi-check-lg"></i>
+        </button>
+        <button id="next-btn" class="btn btn-primary btn-lg px-4 rounded-pill shadow-sm d-none">
+          Próxima <i class="bi bi-arrow-right"></i>
+        </button>
+      </div>
+    </div>
+
+    <div id="result" class="d-none animate-fade-in"></div>
+  </main>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+const params = new URLSearchParams(window.location.search);
+const idJogo = params.get("id");
+const usuarioLogado = JSON.parse(localStorage.getItem("usuario"));
+
+if(usuarioLogado && usuarioLogado.nickname) {
+    document.getElementById("user-display").textContent = usuarioLogado.nickname;
+}
+
+// Elementos DOM
+const quizTitle = document.getElementById("quiz-title");
+const questionEl = document.getElementById("question");
+const optionsEl = document.getElementById("options");
+const confirmBtn = document.getElementById("confirm-btn");
+const nextBtn = document.getElementById("next-btn");
+const resultEl = document.getElementById("result");
+const uploadInput = document.getElementById("upload-input");
+const progressBar = document.getElementById("progress-bar");
+const qCurrentSpan = document.getElementById("q-current");
+const qTotalSpan = document.getElementById("q-total");
+
+// Estado do Jogo
+let questions = [];
+let currentQuestion = 0;
+let score = 0;
+let selectedOption = null;
+let uploadedImages = []; 
+let uploadedFiles = []; 
+
+// --- Carregar Questões ---
+fetch(`/questoes/${idJogo}`)
+  .then(res => res.json())
+  .then(data => {
+    if (!data || data.length === 0) {
+      quizTitle.textContent = "Jogo não encontrado";
+      document.getElementById("quiz-container").classList.add("d-none");
+      return;
+    }
+
+    questions = data.map(q => {
+      if (!q.respostas || q.respostas.length === 0) return null;
+      const r = q.respostas[0]; 
+      const options = [r.opcao1, r.opcao2, r.opcao3, r.opcao4, r.opcao5].filter(o => o);
+      const answerIndex = r.correta ? r.correta - 1 : 0; 
+      return { question: q.enunciado, options, answer: answerIndex };
+    }).filter(q => q !== null);
+
+    if (questions.length === 0) {
+      quizTitle.textContent = "Sem questões cadastradas.";
+      document.getElementById("quiz-container").classList.add("d-none");
+      return;
+    }
+
+    quizTitle.textContent = "Hora do Desafio!";
+    qTotalSpan.textContent = questions.length;
+    updateProgress();
+    loadQuestion();
+  })
+  .catch(err => {
+    console.error(err);
+    quizTitle.textContent = "Erro de conexão.";
+  });
+
+function updateProgress() {
+  const percent = ((currentQuestion) / questions.length) * 100;
+  progressBar.style.width = `${percent}%`;
+  qCurrentSpan.textContent = currentQuestion + 1;
+}
+
+function loadQuestion() {
+  const q = questions[currentQuestion];
+  updateProgress();
+
+  questionEl.textContent = q.question;
+  optionsEl.innerHTML = "";
+  uploadInput.value = "";
+  confirmBtn.disabled = true;
+  confirmBtn.classList.remove("d-none");
+  nextBtn.classList.add("d-none");
+
+  q.options.forEach((opt, index) => {
+    const btn = document.createElement("button");
+    btn.className = "list-group-item list-group-item-action option-btn text-start p-3";
+    btn.innerHTML = `<span class="badge bg-light text-dark me-2 border">${String.fromCharCode(65+index)}</span> ${opt}`;
+    btn.onclick = () => selectOption(index, btn);
+    optionsEl.appendChild(btn);
+  });
+}
+
+function selectOption(index, btn) {
+  selectedOption = index;
+  Array.from(optionsEl.children).forEach(b => b.classList.remove("selected"));
+  btn.classList.add("selected");
+  confirmBtn.disabled = false;
+}
+
+confirmBtn.onclick = () => {
+  const q = questions[currentQuestion];
+  if (selectedOption === null) return;
+
+  const opts = optionsEl.children;
+  if (selectedOption === q.answer) {
+    opts[selectedOption].classList.remove("selected");
+    opts[selectedOption].classList.add("list-group-item-success");
+    score++;
+  } else {
+    opts[selectedOption].classList.remove("selected");
+    opts[selectedOption].classList.add("list-group-item-danger");
+    opts[q.answer].classList.add("list-group-item-success"); // Mostra qual era a certa
+  }
+
+  // Salva dados para IA
+  q.userSelectedText = q.options[selectedOption];
+  q.correctText = q.options[q.answer];
+
+  // Processa Imagem
+  if (uploadInput.files.length > 0) {
+    const file = uploadInput.files[0];
+    uploadedFiles[currentQuestion] = file;
+    const reader = new FileReader();
+    reader.onload = (e) => { uploadedImages[currentQuestion] = e.target.result; };
+    reader.readAsDataURL(file);
+  } else {
+    uploadedImages[currentQuestion] = null;
+    uploadedFiles[currentQuestion] = null;
+  }
+
+  confirmBtn.classList.add("d-none");
+  nextBtn.classList.remove("d-none");
+};
+
+nextBtn.onclick = () => {
+  currentQuestion++;
+  if (currentQuestion < questions.length) {
+    loadQuestion();
+  } else {
+    showResult();
+  }
+};
+
+// --- Tela de Resultado Final ---
+async function showResult() {
+  document.getElementById("quiz-container").classList.add("d-none");
+  document.getElementById("quiz-header").classList.add("d-none");
+  resultEl.classList.remove("d-none");
+
+  const percentage = Math.round((score / questions.length) * 100);
+  let emoji = percentage >= 70 ? "🎉" : "📚";
+  let colorClass = percentage >= 70 ? "text-success" : "text-warning";
+
+  resultEl.innerHTML = `
+    <div class="card border-0 shadow-lg p-5 mb-5 text-center rounded-4">
+      <h1 class="display-4 mb-3">${emoji}</h1>
+      <h2 class="fw-bold ${colorClass}">Você acertou ${score} de ${questions.length}</h2>
+      <div class="progress mt-3" style="height: 20px;">
+        <div class="progress-bar ${percentage >= 70 ? 'bg-success' : 'bg-warning'}" role="progressbar" style="width: ${percentage}%">${percentage}%</div>
+      </div>
+      <p class="text-muted mt-3 mb-0"><i class="bi bi-robot"></i> Aguarde! A IA está analisando suas respostas abaixo...</p>
+    </div>
+  `;
+
+  questions.forEach((q, i) => {
+    const isCorrect = q.userSelectedText === q.correctText;
+    const feedbackId = `feedback-area-${i}`;
+    const statusClass = isCorrect ? "correct" : "wrong";
+    const statusIcon = isCorrect ? '<i class="bi bi-check-circle-fill text-success"></i>' : '<i class="bi bi-x-circle-fill text-danger"></i>';
+
+    resultEl.innerHTML += `
+      <div class="card mb-4 shadow-sm result-card ${statusClass} rounded-4">
+        <div class="card-body p-4">
+          <div class="d-flex justify-content-between align-items-start mb-3">
+            <h5 class="fw-bold text-dark">Questão ${i + 1}</h5>
+            <span class="fs-4">${statusIcon}</span>
+          </div>
+          
+          <p class="mb-3 lead" style="font-size: 1.1rem;">${q.question}</p>
+          
+          <div class="row g-3 mb-3">
+             <div class="col-md-6">
+                <div class="p-3 bg-light rounded border ${isCorrect ? 'border-success' : 'border-danger'}">
+                   <small class="text-muted d-block mb-1">Sua Resposta</small>
+                   <span class="fw-bold ${isCorrect ? 'text-success' : 'text-danger'}">${q.userSelectedText}</span>
+                </div>
+             </div>
+             <div class="col-md-6">
+                <div class="p-3 bg-light rounded border border-success">
+                   <small class="text-muted d-block mb-1">Resposta Correta</small>
+                   <span class="fw-bold text-success">${q.correctText}</span>
+                </div>
+             </div>
+          </div>
+
+          ${uploadedImages[i] ? 
+            `<div class="mb-3">
+               <button class="btn btn-outline-secondary btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#imgCollapse${i}">
+                 <i class="bi bi-image"></i> Ver resolução enviada
+               </button>
+               <div class="collapse mt-2" id="imgCollapse${i}">
+                 <img src="${uploadedImages[i]}" class="img-fluid rounded shadow-sm border" style="max-height: 250px;">
+               </div>
+             </div>` 
+            : ``}
+
+           <div id="${feedbackId}" class="mt-4">
+              <div class="d-flex align-items-center text-muted">
+                 <div class="spinner-border spinner-border-sm text-primary me-2"></div>
+                 Consultando professor IA...
+              </div>
+           </div>
+        </div>
+      </div>
+    `;
+  });
+
+  for (let i = 0; i < questions.length; i++) {
+    await carregarFeedbackIA(i, questions[i], `feedback-area-${i}`);
+  }
+
+  if (usuarioLogado && usuarioLogado.idUsuario) {
+    registrarPartida(usuarioLogado.idUsuario, idJogo, percentage);
+  }
+}
+
+function formatarTextoIA(texto) {
+    if (!texto) return "";
+    let formatado = texto.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    formatado = formatado.replace(/^\* /gm, '• ');
+    formatado = formatado.replace(/\n/g, '<br>');
+    return formatado;
+}
+
+async function carregarFeedbackIA(index, questao, elementId) {
+  const feedbackEl = document.getElementById(elementId);
+  const formData = new FormData();
+  
+  formData.append("enunciado", questao.question);
+  formData.append("respostaAluno", questao.userSelectedText);
+  formData.append("respostaCorreta", questao.correctText);
+  if (uploadedFiles[index]) formData.append("imagem", uploadedFiles[index]);
+
+  try {
+    const response = await fetch("http://localhost:4568/api/analise", {
+      method: "POST",
+      body: formData
+    });
+
+    const data = await response.json();
+    if (data.erro) throw new Error(data.erro);
+
+    const textoFormatado = formatarTextoIA(data.feedback);
+    
+    let html = `
+      <div class="ai-box animate-fade-in">
+        <div class="d-flex">
+           <div class="ai-avatar text-primary">
+              <i class="bi bi-robot"></i>
+           </div>
+           <div class="ai-content w-100">
+              <h6 class="fw-bold text-primary mb-2">Análise do Professor IA</h6>
+              ${data.temImagem ? `<small class="text-muted d-block mb-2 fst-italic border-start border-3 ps-2">"Li na imagem: ${data.texto_ocr.substring(0, 40)}..."</small>` : ''}
+              <div class="text-dark" style="line-height: 1.6;">${textoFormatado}</div>
+           </div>
+        </div>
+      </div>
+    `;
+
+    feedbackEl.innerHTML = html;
+
+  } catch (err) {
+    console.error(err);
+    feedbackEl.innerHTML = `
+       <div class="alert alert-warning d-flex align-items-center">
+         <i class="bi bi-exclamation-triangle-fill me-2"></i>
+         Não foi possível carregar o feedback da IA.
+       </div>`;
+  }
+}
+
+async function registrarPartida(idUsuario, idJogo, pontuacao) {
+  try {
+    await fetch("http://localhost:4568/partida", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ idUsuario: Number(idUsuario), idJogo: Number(idJogo), pontuacao })
+    });
+    console.log("Pontuação salva.");
+  } catch (error) {
+    console.error("Erro ao salvar partida", error);
+  }
+}
+</script>
+
+</body>
+</html>

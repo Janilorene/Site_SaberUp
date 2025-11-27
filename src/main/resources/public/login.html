@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login - SaberUp</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .login-container {
+      max-width: 400px;
+      margin: 6rem auto;
+      padding: 2rem;
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    .login-container h2 { margin-bottom: 1.5rem; color: var(--primary-color); }
+    .login-container input {
+      width: 100%; padding: 0.8rem; margin: 0.5rem 0;
+      border-radius: 10px; border: 1px solid #ccc;
+    }
+    .login-container button {
+      width: 100%; padding: 0.8rem; margin-top: 1rem;
+      border-radius: 10px; font-weight: bold;
+    }
+    .login-container .links { margin-top: 1rem; font-size: 0.9rem; }
+    .login-container .links a {
+      color: var(--primary-color); text-decoration: none; margin: 0 5px;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <h2>Login SaberUp</h2>
+    <input type="email" id="email" placeholder="Email" required>
+    <input type="password" id="senha" placeholder="Senha" required>
+    <button id="btn-login" class="btn btn-primary">Entrar</button>
+    <div class="links">
+      Não tem conta? <a href="cadastro.html">Cadastre-se</a>
+    </div>
+  </div>
+<script>
+document.getElementById('btn-login').addEventListener('click', async () => {
+  const email = document.getElementById('email').value;
+  const senha = document.getElementById('senha').value;
+
+  if (!email || !senha) {
+    alert("Preencha email e senha!");
+    return;
+  }
+
+  try {
+    const res = await fetch('/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, senha })
+    });
+
+    const data = await res.json();
+
+    if (data && data.idUsuario) {
+      // Salva usuário no localStorage usando os nomes corretos
+      localStorage.setItem('usuario', JSON.stringify({
+        idUsuario: data.idUsuario,
+        nickname: data.user  // ⚠️ Use 'nickname' para consistência
+      }));
+
+      alert(data.message || "Login realizado com sucesso!");
+      // Redireciona para a página do usuário
+      window.location.href = 'usuario.html';
+    } else {
+      alert(data.message || "Email ou senha incorretos!");
+    }
+
+  } catch (err) {
+    console.error(err);
+    alert("Erro ao tentar logar. Tente novamente.");
+  }
+});
+</script>
+
+</body>
+</html>

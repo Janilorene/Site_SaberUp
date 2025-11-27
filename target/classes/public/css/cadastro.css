@@ -1,0 +1,63 @@
+body {
+    background-color: rgb(26, 188, 156);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.titulo {
+    text-align: center;
+    color: white;
+    margin-bottom: 20px;
+    font-size: 28px;
+    letter-spacing: 1px;
+}
+
+#log {
+    background-color: white;
+    padding: 30px 25px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 280px;
+    border-radius: 12px;
+    box-shadow: 0px 4px 15px rgba(0,0,0,0.2);
+}
+
+#log label {
+    font-size: 14px;
+    font-weight: bold;
+    color: #333;
+}
+
+#log input {
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    width: 100%;
+    transition: border 0.3s;
+}
+
+#log input:focus {
+    border-color: rgb(26, 188, 156);
+    outline: none;
+}
+
+.botao {
+    background-color: rgb(10, 216, 10);
+    color: white;
+    font-size: 16px;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.botao:hover {
+    background-color: rgb(7, 180, 7);
+}

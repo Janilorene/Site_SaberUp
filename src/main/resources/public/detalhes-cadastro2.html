@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Saber Up - Fluxo Completo de Jogos</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+<style>
+pre {
+  background: #f8f9fa;
+  border-left: 5px solid #0d6efd;
+  padding: 15px;
+  border-radius: 5px;
+  font-size: 0.9rem;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+.explicacao {
+  background: #eef5ff;
+  border-left: 5px solid #0a58ca;
+  padding: 15px;
+  border-radius: 5px;
+  margin-bottom: 2rem;
+}
+</style>
+</head>
+<body class="bg-light">
+
+<nav class="navbar navbar-dark bg-primary p-3 shadow">
+<div class="container-fluid">
+  <a href="home.html" class="navbar-brand"><i class="bi bi-arrow-left"></i> Voltar</a>
+  <span class="navbar-text text-white">Fluxo Completo: CRUD → Quizzes</span>
+</div>
+</nav>
+
+<main class="container my-5">
+<h2 class="text-primary mb-4 text-center">Como os jogos são cadastrados e exibidos nos tópicos</h2>
+
+<!-- Etapa 1: Front-end Criação -->
+<div class="explicacao">
+<h4>🖥️ 1. Front-end cadastra o jogo no CRUD</h4>
+<p>O usuário preenche o formulário de cadastro no CRUD e envia os dados via fetch:</p>
+<pre>
+form.addEventListener("submit", e =&gt; {
+  e.preventDefault();
+  const data = {
+    serieJogo: serieSelect.value,
+    titulo: document.getElementById("titulo").value,
+    materia: materiaSelect.value,
+    topico: topicoSelect.value
+  };
+  fetch("/jogo", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data)
+  }).then(() =&gt; {
+    form.reset();
+    listarJogos(); // atualiza lista no CRUD
+  });
+});
+</pre>
+<p>➡️ Aqui começa o fluxo: Front-end → POST /jogo.</p>
+</div>
+
+<!-- Etapa 2: Aplicacao.java POST -->
+<div class="explicacao">
+<h4>⚙️ 2. Aplicacao.java recebe POST /jogo</h4>
+<pre>
+post("/jogo", (req, res) -&gt; {
+    Jogo j = gson.fromJson(req.body(), Jogo.class);
+    jogoService.add(j.getSerieJogo(), j.getTitulo(), j.getMateria(), j.getTopico());
+    return "Jogo cadastrado!";
+});
+</pre>
+<p>➡️ Spark converte JSON e chama o Service.</p>
+</div>
+
+<!-- Etapa 3: JogoService -->
+<div class="explicacao">
+<h4>🧠 3. JogoService adiciona o jogo</h4>
+<pre>
+public void add(int serieJogo, String titulo, String materia, String topico) {
+    Jogo j = new Jogo(0, titulo, materia, serieJogo, topico);
+    jogoDAO.insert(j);
+}
+</pre>
+<p>➡️ O Service encapsula a lógica de negócio e delega para o DAO.</p>
+</div>
+
+<!-- Etapa 4: JogoDAO -->
+<div class="explicacao">
+<h4>💾 4. JogoDAO insere no banco</h4>
+<pre>
+String sql = "INSERT INTO jogo (titulo, materia, serie_jogo, topico) VALUES (?, ?, ?, ?)";
+try (Connection conn = getConnection();
+     PreparedStatement stmt = conn.prepareStatement(sql)) {
+    stmt.setString(1, j.getTitulo());
+    stmt.setString(2, j.getMateria());
+    stmt.setInt(3, j.getSerieJogo());
+    stmt.setString(4, j.getTopico());
+    stmt.executeUpdate();
+}
+</pre>
+<p>➡️ Agora o jogo está persistido no banco.</p>
+</div>
+
+<!-- Etapa 5: Front lista jogos no CRUD -->
+<div class="explicacao">
+<h4>📋 5. Front-end atualiza lista de jogos</h4>
+<pre>
+function listarJogos() {
+  fetch("/jogos")
+    .then(res =&gt; res.json())
+    .then(jogos =&gt; {
+      lista.innerHTML = "";
+      jogos.forEach(j =&gt; {
+        // gera cards HTML para cada jogo
+      });
+    });
+}
+</pre>
+<p>➡️ O CRUD mostra o jogo recém-cadastrado </p>
+</div>
+
+<!-- Etapa 6: GET /jogos no quizzes -->
+<div class="explicacao">
+<h4>🧭 6. Página de Quizzes carrega jogos do tópico</h4>
+<pre>
+// Pega o parâmetro "topico" da URL
+const params = new URLSearchParams(window.location.search);
+const topico = params.get('topico');
+
+// Faz a requisição ao back-end para buscar os jogos daquele tópico
+fetch(`/jogos?topico=${encodeURIComponent(topico)}`)
+  .then(res => res.json())  // converte a resposta em JSON
+  .then(quizzes => {
+    // Cria cards HTML para cada jogo retornado
+    quizzes.forEach(q => {
+      // código que cria os cards com q.titulo, q.materia, etc.
+    });
+  });
+</pre>
+<p>➡️ O <code>fetch</code> envia para o back-end o nome do tópico e recebe de volta a lista de jogos desse tópico.</p>  
+<p>O JavaScript então cria dinamicamente os cards</p>
+
+</div>
+
+<!-- Etapa 7: Spark GET /jogos -->
+<div class="explicacao">
+<h4>⚙️ 7. Aplicacao.java recebe GET /jogos</h4>
+<pre>
+get("/jogos/topico/:topico", (req, res) -> {
+	String topico = req.params(":topico");
+	res.type("application/json");
+	return gson.toJson(jogoService.listarPorTopico(topico));
+});
+</pre>
+<p>➡️ Spark encaminha para JogoService → JogoDAO → Banco e devolve JSON.</p>
+</div>
+
+<!-- Conclusão -->
+<div class="card shadow-sm p-4 mt-4">
+<h4 class="text-center text-success"><i class="bi bi-check-circle"></i> Conclusão</h4>
+<ol>
+  <li>Usuário cadastra jogo no CRUD.</li>
+  <li>POST /jogo → Spark → Service → DAO → banco.</li>
+  <li>CRUD atualiza lista automaticamente.</li>
+  <li>Próximo GET /jogos (em quizzes.html) retorna também o novo jogo.</li>
+  <li>Quizzes do tópico exibem o jogo cadastrado.</li>
+</ol>
+</div>
+
+</main>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

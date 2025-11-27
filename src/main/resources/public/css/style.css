@@ -1,0 +1,67 @@
+
+:root {
+  --primary-color: #1abc9c;   
+  --primary-dark: #16a085;
+  --primary-light: #48c9b0;
+  --text-color: #333;
+  --bg-color: #f4f6fc;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Segoe UI", Arial, sans-serif;
+}
+
+body {
+  background: var(--bg-color);
+  color: var(--text-color);
+  line-height: 1.6;
+}
+
+.navbar.bg-primary {
+  background-color: var(--primary-color) !important;
+}
+
+.navbar .navbar-brand {
+  color: white !important;
+  font-weight: bold;
+}
+
+.navbar .nav-link {
+  color: black !important;
+  transition: color 0.2s ease;
+}
+
+.navbar .nav-link:hover,
+.navbar .nav-link.active {
+  color: white !important;
+}
+
+.btn-primary {
+  background-color: var(--primary-color) !important;
+  border-color: var(--primary-dark) !important;
+}
+.btn-primary:hover {
+  background-color: var(--primary-dark) !important;
+  border-color: var(--primary-dark) !important;
+}
+
+h1, h2, h3, h4, h5 {
+  color: var(--primary-color);
+}
+
+.text-primary {
+  color: var(--primary-color) !important;
+}
+
+.hover-card {
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border 0.2s ease;
+}
+.hover-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+  border: 2px solid var(--primary-light);
+}
