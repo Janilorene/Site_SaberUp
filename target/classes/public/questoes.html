@@ -405,6 +405,7 @@ function formatarTextoIA(texto) {
     return formatado;
 }
 
+// CORREÇÃO: Removemos o http://localhost:4568
 async function carregarFeedbackIA(index, questao, elementId) {
   const feedbackEl = document.getElementById(elementId);
   const formData = new FormData();
@@ -415,7 +416,8 @@ async function carregarFeedbackIA(index, questao, elementId) {
   if (uploadedFiles[index]) formData.append("imagem", uploadedFiles[index]);
 
   try {
-    const response = await fetch("http://localhost:4568/api/analise", {
+    // URL RELATIVA (Funciona na Nuvem e Local)
+    const response = await fetch("/api/analise", {
       method: "POST",
       body: formData
     });
@@ -452,9 +454,11 @@ async function carregarFeedbackIA(index, questao, elementId) {
   }
 }
 
+// CORREÇÃO: Removemos o http://localhost:4568
 async function registrarPartida(idUsuario, idJogo, pontuacao) {
   try {
-    await fetch("http://localhost:4568/partida", {
+    // URL RELATIVA
+    await fetch("/partida", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ idUsuario: Number(idUsuario), idJogo: Number(idJogo), pontuacao })
