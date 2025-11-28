@@ -162,28 +162,34 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
   <script>
-    const usuarioLogado = JSON.parse(localStorage.getItem('usuario'));
+  const usuarioLogado = JSON.parse(localStorage.getItem('usuario'));
 
-    const EMAIL_ADMIN = "admin@gmail.com"; 
+  const EMAIL_ADMIN = "admin@gmail.com"; 
 
-    if (usuarioLogado) {
+  if (usuarioLogado) {
+    console.log("Usuário logado:", usuarioLogado);
 
-      const btnEntrar = document.getElementById('btn-entrar');
-      const btnCadastrar = document.getElementById('btn-cadastrar');
-      if (btnEntrar) btnEntrar.style.display = 'none';
-      if (btnCadastrar) btnCadastrar.style.display = 'none';
+    const btnEntrar = document.getElementById('btn-entrar');
+    const btnCadastrar = document.getElementById('btn-cadastrar');
+    if (btnEntrar) btnEntrar.style.display = 'none';
+    if (btnCadastrar) btnCadastrar.style.display = 'none';
 
-      const heroDiv = document.querySelector('.hero div');
-      const btnPerfil = document.createElement('a');
-      btnPerfil.href = 'usuario.html';
-      btnPerfil.className = 'btn btn-success shadow';
-      btnPerfil.innerHTML = `<i class="bi bi-person-circle me-2"></i>${usuarioLogado.nickname}`;
-      heroDiv.appendChild(btnPerfil);
-
-      if (usuarioLogado.email === EMAIL_ADMIN) {
-        document.getElementById('li-admin').classList.remove('d-none');
-      }
+    const heroDiv = document.querySelector('.hero div');
+    
+    if (!document.getElementById('btn-perfil-dinamico')) {
+        const btnPerfil = document.createElement('a');
+        btnPerfil.id = 'btn-perfil-dinamico';
+        btnPerfil.href = 'usuario.html';
+        btnPerfil.className = 'btn btn-success shadow';
+        btnPerfil.innerHTML = `<i class="bi bi-person-circle me-2"></i>${usuarioLogado.user || usuarioLogado.nickname}`;
+        heroDiv.appendChild(btnPerfil);
     }
-  </script>
+
+    if (usuarioLogado.email && usuarioLogado.email === EMAIL_ADMIN) {
+      const liAdmin = document.getElementById('li-admin');
+      if (liAdmin) liAdmin.classList.remove('d-none');
+    }
+  }
+</script>
 </body>
 </html>
