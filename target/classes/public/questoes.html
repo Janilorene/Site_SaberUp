@@ -19,7 +19,6 @@
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
 
-    /* Navbar Customizada e Moderna */
     .navbar {
       background: linear-gradient(135deg, #0d6efd, #0043a8) !important;
     }
@@ -38,7 +37,6 @@
         border-bottom: 2px solid white;
     }
 
-    /* Quiz Card */
     .quiz-card {
       border: none;
       border-radius: 20px;
@@ -64,7 +62,6 @@
       border-color: var(--primary-color);
     }
 
-    /* Resultado & IA */
     .result-card {
       border-left: 5px solid transparent;
     }
@@ -92,7 +89,6 @@
       margin-right: 15px;
     }
 
-    /* Formatação do Texto da IA */
     .ai-content strong {
       color: #0043a8;
       font-weight: 700;
@@ -416,7 +412,6 @@ async function carregarFeedbackIA(index, questao, elementId) {
   if (uploadedFiles[index]) formData.append("imagem", uploadedFiles[index]);
 
   try {
-    // URL RELATIVA (Funciona na Nuvem e Local)
     const response = await fetch("/api/analise", {
       method: "POST",
       body: formData
@@ -454,10 +449,8 @@ async function carregarFeedbackIA(index, questao, elementId) {
   }
 }
 
-// CORREÇÃO: Removemos o http://localhost:4568
 async function registrarPartida(idUsuario, idJogo, pontuacao) {
   try {
-    // URL RELATIVA
     await fetch("/partida", {
       method: "POST",
       headers: { "Content-Type": "application/json" },

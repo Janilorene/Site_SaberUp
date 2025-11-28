@@ -42,7 +42,6 @@
   </style>
 </head>
 <body>
-  <!-- NAVBAR -->
   <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow">
     <div class="container-fluid">
       <a class="navbar-brand d-flex align-items-center fw-bold" href="index.html">
@@ -62,7 +61,6 @@
     </div>
   </nav>
 
-  <!-- MAIN -->
   <main>
     <section class="perfil">
       <img src="profile-picture-example.png" alt="Foto do usuário" class="foto-perfil">
@@ -96,7 +94,6 @@
   <script>
 const usuario = JSON.parse(localStorage.getItem("usuario"));
 
-// Verifica se o usuário está logado
 if (!usuario || !usuario.idUsuario) {
   alert("Usuário não logado. Faça login.");
   window.location.href = "login.html";

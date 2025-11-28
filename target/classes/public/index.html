@@ -5,11 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SaberUp - Aprenda jogando</title>
   
-  <!-- Bootstrap e ícones -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
   
-  <!-- Seu estilo -->
   <link rel="stylesheet" href="css/style.css">
 
   <style>
@@ -96,7 +94,6 @@
 </head>
 
 <body>
-  <!-- NAVBAR -->
   <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow">
     <div class="container-fluid">
       <a class="navbar-brand d-flex align-items-center fw-bold" href="index.html">
@@ -110,14 +107,17 @@
         <ul class="navbar-nav ms-auto">
           <li class="nav-item"><a class="nav-link active" href="index.html" id="link-inicio"><i class="bi bi-house-door-fill"></i> Início</a></li>
           <li class="nav-item"><a class="nav-link" href="materias.html" id="link-materias"><i class="bi bi-journal-bookmark-fill"></i> Matérias</a></li>
-          <li class="nav-item"><a class="nav-link" href="CRUD_jogos.html" id="link-materias"><i class="bi bi-journal-bookmark-fill"></i> Cadastrar Matérias</a></li>
+          
+          <li class="nav-item d-none" id="li-admin">
+            <a class="nav-link" href="CRUD_jogos.html" id="link-crud"><i class="bi bi-gear-fill"></i> Cadastrar Matérias</a>
+          </li>
+          
           <li class="nav-item"><a class="nav-link" href="usuario.html" id="link-usuario"><i class="bi bi-person-circle"></i> Usuário</a></li>
         </ul>
       </div>
     </div>
   </nav>
 
-  <!-- HERO -->
   <section class="hero">
     <h1>Aprenda jogando com o SaberUp!</h1>
     <p>Desafie seus conhecimentos em Matemática com quizzes interativos, melhore seu desempenho e divirta-se enquanto aprende!</p>
@@ -134,7 +134,6 @@
     </div>
   </section>
 
-  <!-- INFO SECTION -->
   <section class="info-section">
     <h2>Por que escolher o SaberUp?</h2>
     <div class="info-icons">
@@ -156,18 +155,19 @@
     </div>
   </section>
 
-  <!-- FOOTER -->
   <footer>
     <small>© 2025 SaberUp — Desenvolvido com 💙 para o aprendizado.</small>
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
-  <!-- SCRIPT LOGIN -->
   <script>
     const usuarioLogado = JSON.parse(localStorage.getItem('usuario'));
 
+    const EMAIL_ADMIN = "admin@gmail.com"; 
+
     if (usuarioLogado) {
+
       const btnEntrar = document.getElementById('btn-entrar');
       const btnCadastrar = document.getElementById('btn-cadastrar');
       if (btnEntrar) btnEntrar.style.display = 'none';
@@ -179,6 +179,10 @@
       btnPerfil.className = 'btn btn-success shadow';
       btnPerfil.innerHTML = `<i class="bi bi-person-circle me-2"></i>${usuarioLogado.nickname}`;
       heroDiv.appendChild(btnPerfil);
+
+      if (usuarioLogado.email === EMAIL_ADMIN) {
+        document.getElementById('li-admin').classList.remove('d-none');
+      }
     }
   </script>
 </body>
