@@ -19,19 +19,23 @@ public class UsuarioController {
         u.setSenha(req.queryParams("senha"));
 
         boolean ok = usuarioService.cadastrar(u);
-        if (ok) res.redirect("/login.html");
-        else res.redirect("/cadastro.html?erro=1");
+        if (ok)
+            res.redirect("/login.html");
+        else
+            res.redirect("/cadastro.html?erro=1");
         return null;
     }
 
     public Object login(Request req, Response res) {
         res.type("application/json");
         Map<String, String> dados = gson.fromJson(req.body(), Map.class);
+
         return usuarioService.login(dados.get("email"), dados.get("senha"))
                 .map(u -> gson.toJson(Map.of(
                         "message", "Login realizado com sucesso!",
                         "user", u.getNickname(),
-                        "idUsuario", u.getIdUsuario()
+                        "idUsuario", u.getIdUsuario(),
+                        "email", u.getEmail() // <--- ADICIONE ESTA LINHA!
                 )))
                 .orElseGet(() -> gson.toJson(Map.of("message", "Email ou senha incorretos!")));
     }
