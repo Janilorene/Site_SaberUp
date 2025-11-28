@@ -164,16 +164,19 @@
   <script>
   const usuarioLogado = JSON.parse(localStorage.getItem('usuario'));
 
-  const EMAIL_ADMIN = "admin@gmail.com"; 
+  // Define o ID do admin como um NÚMERO (sem aspas)
+  const ADMIN_ID = 1; 
 
   if (usuarioLogado) {
-    console.log("Usuário logado:", usuarioLogado);
+    console.log("Usuário logado:", usuarioLogado); // Para conferir no F12 se o idUsuario é 1 mesmo
 
+    // Esconde botões de login/cadastro
     const btnEntrar = document.getElementById('btn-entrar');
     const btnCadastrar = document.getElementById('btn-cadastrar');
     if (btnEntrar) btnEntrar.style.display = 'none';
     if (btnCadastrar) btnCadastrar.style.display = 'none';
 
+    // Mostra botão de perfil
     const heroDiv = document.querySelector('.hero div');
     
     if (!document.getElementById('btn-perfil-dinamico')) {
@@ -185,7 +188,9 @@
         heroDiv.appendChild(btnPerfil);
     }
 
-    if (usuarioLogado.email && usuarioLogado.email === EMAIL_ADMIN) {
+    // Lógica Admin: Verifica se o ID é 1
+    // Atenção: idUsuario deve vir do JSON do login
+    if (usuarioLogado.idUsuario === ADMIN_ID) {
       const liAdmin = document.getElementById('li-admin');
       if (liAdmin) liAdmin.classList.remove('d-none');
     }
