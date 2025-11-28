@@ -12,7 +12,6 @@ import java.net.http.HttpResponse;
 
 public class AzureOCRService {
 
-    // 1. Método seguro para pegar a chave
     private static String getAzureKey() {
         String key = System.getenv("AZURE_KEY");
         if (key == null || key.isEmpty()) {
@@ -21,13 +20,11 @@ public class AzureOCRService {
         return key;
     }
 
-    // 2. Método seguro para pegar o Endpoint (URL)
     private static String getAzureEndpoint() {
         String endpoint = System.getenv("AZURE_ENDPOINT");
         if (endpoint == null || endpoint.isEmpty()) {
             return "ENDPOINT_NAO_CONFIGURADO";
         }
-        // Garante que o endpoint termine com /
         return endpoint.endsWith("/") ? endpoint : endpoint + "/";
     }
 
@@ -41,7 +38,6 @@ public class AzureOCRService {
 
     public String extrairTexto(byte[] imagemBytes) {
         try {
-            // URL para OCR (Read API)
             String endpoint = getAzureEndpoint();
             String url = endpoint + "vision/v3.2/read/analyze";
             
@@ -62,12 +58,11 @@ public class AzureOCRService {
                 return null;
             }
 
-            // 2. Pegar a URL de operação (onde o resultado estará)
+            // 2. Pegar a URL de operação 
             String operationLocation = response.headers().firstValue("Operation-Location").orElse(null);
             
             if (operationLocation == null) return null;
 
-            // 3. Polling para pegar o resultado
             return aguardarResultado(operationLocation, key);
 
         } catch (Exception e) {
@@ -79,7 +74,7 @@ public class AzureOCRService {
     private String aguardarResultado(String url, String key) throws Exception {
         int tentativas = 0;
         while (tentativas < 10) {
-            Thread.sleep(1000); // Espera 1 segundo
+            Thread.sleep(1000); 
 
             HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(url))
@@ -90,7 +85,6 @@ public class AzureOCRService {
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
             JsonObject json = gson.fromJson(response.body(), JsonObject.class);
             
-            // Verifica status
             String status = "";
             if (json.has("status")) {
                 status = json.get("status").getAsString();
@@ -103,7 +97,7 @@ public class AzureOCRService {
             }
             tentativas++;
         }
-        return null; // Timeout
+        return null; 
     }
 
     private String parsearTexto(JsonObject json) {

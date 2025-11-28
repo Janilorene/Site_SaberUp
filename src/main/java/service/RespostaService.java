@@ -11,7 +11,6 @@ public class RespostaService {
     private RespostaDAO respostaDAO = new RespostaDAO();
     private Gson gson = new Gson();
 
-    // POST /resposta
     public Object add(Request req, Response res) {
         res.type("application/json");
         Resposta r = gson.fromJson(req.body(), Resposta.class);
@@ -20,7 +19,6 @@ public class RespostaService {
         return gson.toJson(status ? "Resposta salva com sucesso!" : "Erro ao salvar resposta!");
     }
 
-    // PUT /resposta/:id
     public Object update(Request req, Response res) {
         res.type("application/json");
         int id = Integer.parseInt(req.params(":id"));
@@ -31,7 +29,6 @@ public class RespostaService {
         return gson.toJson(status ? "Resposta atualizada com sucesso!" : "Erro ao atualizar resposta!");
     }
 
-    // DELETE /resposta/:id
     public Object delete(Request req, Response res) {
         res.type("application/json");
         int id = Integer.parseInt(req.params(":id"));

@@ -16,7 +16,6 @@ public class QuestaoService {
     private RespostaDAO respostaDAO = new RespostaDAO();
     private Gson gson = new Gson();
 
-    // POST /questao
     public String add(Request req, Response res) {
         res.type("application/json");
         Questao q = gson.fromJson(req.body(), Questao.class);
@@ -25,7 +24,6 @@ public class QuestaoService {
         return gson.toJson(status ? "Questão inserida com sucesso!" : "Erro ao inserir questão!");
     }
 
-    // PUT /questao/:id
     public String update(Request req, Response res) {
         res.type("application/json");
         int id = Integer.parseInt(req.params(":id"));
@@ -35,7 +33,6 @@ public class QuestaoService {
         return gson.toJson(status ? "Questão atualizada com sucesso!" : "Erro ao atualizar questão!");
     }
 
-    // DELETE /questao/:id
     public String delete(Request req, Response res) {
         res.type("application/json");
         int id = Integer.parseInt(req.params(":id"));
@@ -44,7 +41,6 @@ public class QuestaoService {
         return gson.toJson(status ? "Questão removida com sucesso!" : "Erro ao remover questão!");
     }
 
-    // GET /questoes/:idJogo
     public String listarPorJogo(Request req, Response res) {
         res.type("application/json");
         int idJogo = Integer.parseInt(req.params(":idJogo"));

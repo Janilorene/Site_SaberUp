@@ -10,19 +10,15 @@ import java.net.http.HttpResponse;
 
 public class GeminiService {
 
-    // 1. Método seguro para pegar a chave
     private static String getApiKey() {
-        // Tenta pegar da variável de ambiente (Nuvem)
         String key = System.getenv("GEMINI_API_KEY");
         
         if (key == null || key.isEmpty()) {
-            // Se não achar (rodando local), retorna aviso ou uma chave de teste
             return "CHAVE_NAO_CONFIGURADA"; 
         }
         return key;
     }
 
-    // 2. Definimos apenas a BASE da URL (sem a chave aqui)
     private static final String URL_BASE = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=";
 
     private final Gson gson = new Gson();
@@ -51,7 +47,6 @@ public class GeminiService {
 
     private String enviarParaGemini(String prompt) {
         try {
-            // Montagem do JSON
             JsonObject textPart = new JsonObject();
             textPart.addProperty("text", prompt);
 
@@ -69,10 +64,8 @@ public class GeminiService {
 
             String jsonBody = gson.toJson(body);
 
-            // 3. AQUI NÓS JUNTAMOS A URL COM A CHAVE SEGURA
             String urlCompleta = URL_BASE + getApiKey();
 
-            // Envio da Requisição
             HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(urlCompleta))
                 .header("Content-Type", "application/json")

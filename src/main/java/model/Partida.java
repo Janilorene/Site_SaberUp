@@ -6,16 +6,15 @@ public class Partida {
     private int idJogo;
     private int pontuacao;
 
-    // Campos do jogo
+
     private String titulo;
     private String materia;
     private String topico;
     private String serieJogo;
 
-    // Campos de resolução IA
     private String resolucaoTexto;
     private String resolucaoFeedback;
-    private double[] embedding; // <-- novo campo
+    private double[] embedding; 
 
     public Partida() {}
 

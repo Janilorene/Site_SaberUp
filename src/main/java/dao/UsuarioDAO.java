@@ -13,7 +13,6 @@ public class UsuarioDAO extends DAO {
 
     public void add(Usuario u) {
         String sql = "INSERT INTO usuario (email, nickname, serie_usuario, senha, assinante) VALUES (?, ?, ?, ?, ?)";
-        // Nota: Não colocamos 'conexao' dentro do try(), pois não queremos fechá-la ao fim do método
         try (PreparedStatement stmt = conexao.prepareStatement(sql)) {
             stmt.setString(1, u.getEmail());
             stmt.setString(2, u.getNickname());

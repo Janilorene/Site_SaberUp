@@ -60,14 +60,12 @@ document.getElementById('btn-login').addEventListener('click', async () => {
     const data = await res.json();
 
     if (data && data.idUsuario) {
-      // Salva usuário no localStorage usando os nomes corretos
       localStorage.setItem('usuario', JSON.stringify({
         idUsuario: data.idUsuario,
-        nickname: data.user  // ⚠️ Use 'nickname' para consistência
+        nickname: data.user  
       }));
 
       alert(data.message || "Login realizado com sucesso!");
-      // Redireciona para a página do usuário
       window.location.href = 'usuario.html';
     } else {
       alert(data.message || "Email ou senha incorretos!");

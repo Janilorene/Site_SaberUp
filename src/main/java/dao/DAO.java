@@ -15,12 +15,10 @@ public class DAO {
         try {
             Class.forName("org.postgresql.Driver");
             
-            // 1. Tenta pegar as configurações das Variáveis de Ambiente (Nuvem)
             String url = System.getenv("DB_URL");
             String user = System.getenv("DB_USER");
             String pass = System.getenv("DB_PASS");
 
-            // 2. Se não encontrar (está rodando local), usa o padrão do pgAdmin
             if (url == null || url.isEmpty()) {
                 url = "jdbc:postgresql://localhost:5432/saberup";
                 user = "ti2cc";
